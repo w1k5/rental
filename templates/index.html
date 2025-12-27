@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Buy or Rent?</title>
     <meta name="description" content="Month-by-month buy vs rent break-even simulator (variable/fixed mortgage rates, real vs nominal dollars).">
     <meta property="og:title" content="Buy or Rent?">
@@ -18,17 +19,18 @@
     <meta name="twitter:image" content="{{ url_for('og_image', _external=True) }}">
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Crect%20width%3D%27100%27%20height%3D%27100%27%20rx%3D%2720%27%20fill%3D%27%231652f0%27/%3E%3Cg%20fill%3D%27%23fff%27%3E%3Crect%20x%3D%2712%27%20y%3D%2746%27%20width%3D%2718%27%20height%3D%2742%27%20rx%3D%272%27/%3E%3Crect%20x%3D%2733%27%20y%3D%2730%27%20width%3D%2722%27%20height%3D%2758%27%20rx%3D%272%27/%3E%3Crect%20x%3D%2758%27%20y%3D%2740%27%20width%3D%2730%27%20height%3D%2748%27%20rx%3D%272%27/%3E%3Crect%20x%3D%2739%27%20y%3D%2722%27%20width%3D%2710%27%20height%3D%276%27%20rx%3D%271%27/%3E%3C/g%3E%3Cg%20fill%3D%27%231652f0%27%3E%3Crect%20x%3D%2717%27%20y%3D%2752%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2722%27%20y%3D%2752%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2717%27%20y%3D%2758%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2722%27%20y%3D%2758%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2738%27%20y%3D%2736%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2743%27%20y%3D%2736%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2748%27%20y%3D%2736%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2738%27%20y%3D%2742%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2743%27%20y%3D%2742%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2748%27%20y%3D%2742%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2738%27%20y%3D%2748%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2743%27%20y%3D%2748%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2748%27%20y%3D%2748%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2765%27%20y%3D%2746%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2770%27%20y%3D%2746%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2775%27%20y%3D%2746%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2765%27%20y%3D%2752%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2770%27%20y%3D%2752%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3Crect%20x%3D%2775%27%20y%3D%2752%27%20width%3D%273%27%20height%3D%273%27%20rx%3D%270.6%27/%3E%3C/g%3E%3C/svg%3E">
     <style>
+      *, *::before, *::after { box-sizing: border-box; }
       body { font-family: Arial, sans-serif; margin: 32px; max-width: 960px; }
       h1 { margin-bottom: 8px; }
       p.lead { margin-top: 0; color: #444; }
       ul.key-points { margin-top: 0; }
       .section { margin: 12px 0 20px; }
       form { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px 16px; }
-      fieldset { border: 1px solid #ddd; padding: 12px; border-radius: 6px; background: #fafafa; }
+      fieldset { border: 1px solid #ddd; padding: 12px; border-radius: 6px; background: #fafafa; min-width: 0; }
       legend { font-weight: 700; padding: 0 6px; }
       .group { grid-column: 1 / -1; }
       label { display: block; font-weight: 600; margin-bottom: 4px; }
-      input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
+      input { width: 100%; max-width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
       .chip { display: inline-block; padding: 2px 6px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-left: 6px; }
       .chip-owner { background: #e6edff; color: #1236a3; border: 1px solid #c5d5ff; }
       .chip-renter { background: #e5f7ec; color: #186a3b; border: 1px solid #c2e8d0; }
@@ -40,6 +42,7 @@
       .pill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
       .pill { background: white; border: 1px solid #dcdcdc; border-radius: 6px; padding: 12px; }
       .pill-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #666; margin-bottom: 4px; }
+      .table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 6px; }
       .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
       .table th, .table td { border: 1px solid #ddd; padding: 6px 8px; text-align: right; font-variant-numeric: tabular-nums; }
       .table th { text-align: left; background: #f0f0f0; }
@@ -50,12 +53,24 @@
       .muted { color: #555; }
       .segmented { display: inline-flex; border: 1px solid #cfcfcf; border-radius: 8px; overflow: hidden; background: white; }
       .segmented input { position: absolute; opacity: 0; pointer-events: none; }
-      .segmented label { margin: 0; padding: 8px 12px; font-weight: 700; cursor: pointer; user-select: none; border-right: 1px solid #e2e2e2; }
+      .segmented label { margin: 0; padding: 10px 12px; font-weight: 700; cursor: pointer; user-select: none; border-right: 1px solid #e2e2e2; white-space: nowrap; }
       .segmented label:last-child { border-right: none; }
       .segmented input:checked + label { background: #1652f0; color: white; border-right-color: #1652f0; }
       .segmented label:hover { background: #f3f6ff; }
       .segmented input:checked + label:hover { background: #1652f0; }
       .hide { display: none; }
+
+      @media (max-width: 640px) {
+        body { margin: 16px; }
+        form { grid-template-columns: 1fr; gap: 10px; }
+        fieldset { padding: 10px; }
+        .section { margin: 10px 0 16px; }
+        .pill-grid { grid-template-columns: 1fr; }
+        .segmented { width: 100%; }
+        .segmented label { flex: 1; text-align: center; white-space: normal; }
+        button { width: 100%; }
+        .table th, .table td { padding: 6px 6px; }
+      }
     </style>
   </head>
   <body>
@@ -157,34 +172,36 @@
         </div>
         {% if checkpoints %}
           <div style="margin-top: 12px; font-weight: 700;">Yearly checkpoints (real/nominal matches your reporting choice)</div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Month</th>
-                <th>Rate</th>
-                <th>Owner outflow</th>
-                <th>Rent</th>
-                <th>Owner net worth</th>
-                <th>Renter net worth</th>
-                <th>Home value</th>
-                <th>Mortgage bal.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in checkpoints %}
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
                 <tr>
-                  <td>{{ row.month }}</td>
-                  <td>{{ "%.3f"|format(row.mortgage_rate) }}</td>
-                  <td>${{ "{:,.0f}".format(row.owner_outflow) }}</td>
-                  <td>${{ "{:,.0f}".format(row.rent) }}</td>
-                  <td>${{ "{:,.0f}".format(row.nw_buy) }}</td>
-                  <td>${{ "{:,.0f}".format(row.nw_rent) }}</td>
-                  <td>${{ "{:,.0f}".format(row.home_value) }}</td>
-                  <td>${{ "{:,.0f}".format(row.mortgage_balance) }}</td>
+                  <th>Month</th>
+                  <th>Rate</th>
+                  <th>Owner outflow</th>
+                  <th>Rent</th>
+                  <th>Owner net worth</th>
+                  <th>Renter net worth</th>
+                  <th>Home value</th>
+                  <th>Mortgage bal.</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for row in checkpoints %}
+                  <tr>
+                    <td>{{ row.month }}</td>
+                    <td>{{ "%.3f"|format(row.mortgage_rate) }}</td>
+                    <td>${{ "{:,.0f}".format(row.owner_outflow) }}</td>
+                    <td>${{ "{:,.0f}".format(row.rent) }}</td>
+                    <td>${{ "{:,.0f}".format(row.nw_buy) }}</td>
+                    <td>${{ "{:,.0f}".format(row.nw_rent) }}</td>
+                    <td>${{ "{:,.0f}".format(row.home_value) }}</td>
+                    <td>${{ "{:,.0f}".format(row.mortgage_balance) }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
           <div class="helper">Checkpoints include month 0, each anniversary, and the break-even month if it lands between years.</div>
         {% endif %}
       </div>
