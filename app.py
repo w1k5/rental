@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Dict, Optional
 
-from flask import Flask, render_template, request
+from flask import Flask, Response, render_template, request
 
 from simulation import ScenarioParams, simulate_break_even
 
@@ -265,6 +265,99 @@ def index():
         breakeven_row=breakeven_row,
         checkpoints=checkpoints,
     )
+
+
+@app.get("/og.svg")
+def og_image() -> Response:
+    title = "Buy vs Rent Simulator"
+    subtitle = "Month-by-month break-even • Variable/Fixed rates • Real vs nominal"
+    url = request.url_root.rstrip("/")
+    svg = f"""<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f2f8f"/>
+      <stop offset="100%" stop-color="#1652f0"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="70" width="1060" height="490" rx="28" fill="rgba(255,255,255,0.12)"/>
+  </g>
+
+  <g fill="#ffffff" opacity="0.92">
+    <rect x="120" y="360" width="70" height="160" rx="6"/>
+    <rect x="210" y="300" width="90" height="220" rx="6"/>
+    <rect x="320" y="250" width="80" height="270" rx="6"/>
+    <rect x="420" y="320" width="110" height="200" rx="6"/>
+    <rect x="550" y="280" width="75" height="240" rx="6"/>
+    <rect x="645" y="340" width="130" height="180" rx="6"/>
+  </g>
+
+  <g fill="#1652f0" opacity="0.95">
+    <circle cx="165" cy="395" r="5"/>
+    <circle cx="165" cy="415" r="5"/>
+    <circle cx="165" cy="435" r="5"/>
+    <circle cx="165" cy="455" r="5"/>
+
+    <circle cx="250" cy="340" r="5"/>
+    <circle cx="250" cy="360" r="5"/>
+    <circle cx="250" cy="380" r="5"/>
+    <circle cx="250" cy="400" r="5"/>
+
+    <circle cx="360" cy="290" r="5"/>
+    <circle cx="360" cy="310" r="5"/>
+    <circle cx="360" cy="330" r="5"/>
+    <circle cx="360" cy="350" r="5"/>
+
+    <circle cx="470" cy="360" r="5"/>
+    <circle cx="470" cy="380" r="5"/>
+    <circle cx="470" cy="400" r="5"/>
+    <circle cx="470" cy="420" r="5"/>
+
+    <circle cx="587" cy="320" r="5"/>
+    <circle cx="587" cy="340" r="5"/>
+    <circle cx="587" cy="360" r="5"/>
+    <circle cx="587" cy="380" r="5"/>
+
+    <circle cx="710" cy="375" r="5"/>
+    <circle cx="710" cy="395" r="5"/>
+    <circle cx="710" cy="415" r="5"/>
+    <circle cx="710" cy="435" r="5"/>
+  </g>
+
+  <text x="120" y="200" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+        font-size="68" font-weight="800" fill="#ffffff">{title}</text>
+  <text x="120" y="260" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+        font-size="30" font-weight="600" fill="rgba(255,255,255,0.90)">{subtitle}</text>
+
+  <g>
+    <rect x="120" y="300" width="520" height="64" rx="14" fill="rgba(0,0,0,0.16)"/>
+    <text x="148" y="343" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+          font-size="24" font-weight="700" fill="#ffffff">{url}</text>
+  </g>
+
+  <g transform="translate(825, 165)" filter="url(#shadow)">
+    <rect width="280" height="160" rx="22" fill="rgba(255,255,255,0.16)"/>
+    <path d="M40 120 L90 75 L140 105 L190 55 L240 80" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="90" cy="75" r="8" fill="#ffffff"/>
+    <circle cx="140" cy="105" r="8" fill="#ffffff"/>
+    <circle cx="190" cy="55" r="8" fill="#ffffff"/>
+    <circle cx="240" cy="80" r="8" fill="#ffffff"/>
+    <text x="40" y="52" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"
+          font-size="20" font-weight="800" fill="#ffffff">Break-even</text>
+  </g>
+</svg>
+"""
+
+    resp = Response(svg, mimetype="image/svg+xml")
+    resp.headers["Cache-Control"] = "public, max-age=3600"
+    return resp
 
 
 if __name__ == "__main__":
