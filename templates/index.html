@@ -32,6 +32,11 @@
       .group { grid-column: 1 / -1; }
       label { display: block; font-weight: 600; margin-bottom: 4px; }
       input { width: 100%; max-width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+      .input-row { display: flex; gap: 10px; align-items: stretch; }
+      .input-row > * { min-width: 0; }
+      .input-pct { flex: 0 0 140px; }
+      .input-pct input { text-align: right; }
+      .field-hint { color: #666; font-size: 12px; margin-top: 4px; }
       .chip { display: inline-block; padding: 2px 6px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-left: 6px; }
       .chip-owner { background: #e6edff; color: #1236a3; border: 1px solid #c5d5ff; }
       .chip-renter { background: #e5f7ec; color: #186a3b; border: 1px solid #c2e8d0; }
@@ -86,7 +91,7 @@
       </ul>
       <div class="helper">Tip: use the rate schedule format <span class="inline-code">start_month:annual_rate</span> (e.g., <span class="inline-code">0:0.065,24:0.075,60:0.060</span>) for variable mortgages. Chips mark whether an input impacts the Owner, Renter, or Both.</div>
     </div>
-    <form method="POST" action="{{ url_for('index') }}">
+    <form id="sim-form" method="POST" action="{{ url_for('index') }}">
       {% for group in groups %}
         <fieldset class="group">
           <legend>{{ group.title }} {% if group.scope %}<span class="chip chip-{{ group.scope|lower }}">{{ group.scope }}</span>{% endif %}</legend>
@@ -94,8 +99,21 @@
           {% for field in group.fields %}
             <div>
               <label for="{{ field.name }}">{{ field.label }} <span class="chip chip-{{ field.scope|lower }}">{{ field.scope }}</span></label>
-              <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ request.form.get(field.name, field.value) }}">
-              {% if field_errors and field_errors.get(field.name) %}<div class="field-error">{{ field_errors.get(field.name) }}</div>{% endif %}
+              {% if field.name == 'down_payment' %}
+                <div class="input-row">
+                  <div style="flex: 1 1 auto;">
+                    <input type="text" id="down_payment" name="down_payment" inputmode="decimal" value="{{ request.form.get('down_payment', field.value) }}">
+                    {% if field_errors and field_errors.get('down_payment') %}<div class="field-error">{{ field_errors.get('down_payment') }}</div>{% endif %}
+                    <div class="field-hint">Enter either $ or % (syncs to purchase price).</div>
+                  </div>
+                  <div class="input-pct">
+                    <input type="text" id="down_payment_pct" name="down_payment_pct" inputmode="decimal" value="">
+                  </div>
+                </div>
+              {% else %}
+                <input type="text" id="{{ field.name }}" name="{{ field.name }}" value="{{ request.form.get(field.name, field.value) }}">
+              {% endif %}
+              {% if field.name != 'down_payment' and field_errors and field_errors.get(field.name) %}<div class="field-error">{{ field_errors.get(field.name) }}</div>{% endif %}
             </div>
           {% endfor %}
         </fieldset>
@@ -220,6 +238,95 @@
         });
       </script>
     {% endif %}
+    <script>
+      (function () {
+        var priceEl = document.getElementById('purchase_price');
+        var amountEl = document.getElementById('down_payment');
+        var pctEl = document.getElementById('down_payment_pct');
+        if (!priceEl || !amountEl || !pctEl) return;
+
+        var lastEdited = 'amount';
+
+        function parseNumber(raw) {
+          if (raw == null) return NaN;
+          var s = String(raw).trim();
+          if (!s) return NaN;
+          s = s.replace(/[$,%\s]/g, '');
+          s = s.replace(/,/g, '');
+          return Number(s);
+        }
+
+        function clampPct(p) {
+          if (!Number.isFinite(p)) return NaN;
+          return Math.max(0, Math.min(100, p));
+        }
+
+        function formatPct(p) {
+          if (!Number.isFinite(p)) return '';
+          var rounded = Math.round(p * 10) / 10;
+          return String(rounded) + '%';
+        }
+
+        function formatDollars(n) {
+          if (!Number.isFinite(n)) return '';
+          return String(Math.round(n));
+        }
+
+        function syncFromAmount() {
+          var price = parseNumber(priceEl.value);
+          var amount = parseNumber(amountEl.value);
+          if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(amount)) {
+            pctEl.value = '';
+            return;
+          }
+          pctEl.value = formatPct((amount / price) * 100);
+        }
+
+        function enforcePctSuffix() {
+          var v = String(pctEl.value || '').trim();
+          if (!v) return;
+          if (!v.endsWith('%')) pctEl.value = v.replace(/%/g, '') + '%';
+          // Keep caret before the trailing % when editing.
+          var pos = pctEl.value.length - 1;
+          try { pctEl.setSelectionRange(pos, pos); } catch (e) {}
+        }
+
+        function syncFromPct() {
+          var price = parseNumber(priceEl.value);
+          var pct = clampPct(parseNumber(pctEl.value));
+          if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(pct)) return;
+          amountEl.value = formatDollars((pct / 100) * price);
+        }
+
+        function syncOnPriceChange() {
+          if (lastEdited === 'pct') syncFromPct();
+          else syncFromAmount();
+        }
+
+        amountEl.addEventListener('input', function () {
+          lastEdited = 'amount';
+          syncFromAmount();
+        });
+        pctEl.addEventListener('input', function () {
+          lastEdited = 'pct';
+          enforcePctSuffix();
+          syncFromPct();
+        });
+        pctEl.addEventListener('focus', enforcePctSuffix);
+        pctEl.addEventListener('click', function () { enforcePctSuffix(); });
+        priceEl.addEventListener('input', syncOnPriceChange);
+
+        var form = document.getElementById('sim-form');
+        if (form) {
+          form.addEventListener('submit', function () {
+            if (lastEdited === 'pct') syncFromPct();
+            else syncFromAmount();
+          });
+        }
+
+        syncFromAmount();
+      })();
+    </script>
     <script>
       (function () {
         function setMortgageMode(mode) {
