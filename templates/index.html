@@ -162,6 +162,10 @@
         <h2 style="margin: 0 0 8px 0;">Results</h2>
         {% if result.break_even_month is not none %}
           <div><strong>Break-even:</strong> month {{ result.break_even_month }} (~{{ "%.2f"|format(result.break_even_years) }} years) comparing {{ "real" if result.used_real_dollars else "nominal" }} dollars.</div>
+          <div class="helper">
+            Owner net worth includes saleable home equity: <span class="inline-code">home value − selling costs − remaining mortgage</span>
+            (selling costs assumed {{ "%.1f"|format(result.assumptions.sell_cost_pct * 100) }}% of home value), plus any invested monthly savings vs renting.
+          </div>
         {% else %}
           <div><strong>No break-even within horizon.</strong> Owner never catches renter under these assumptions.</div>
         {% endif %}
@@ -185,7 +189,14 @@
             <div class="pill">
               <div class="pill-label">Net worth at break-even</div>
               <div>Owner ${{ "{:,.0f}".format(breakeven_row.nw_buy) }} | Renter ${{ "{:,.0f}".format(breakeven_row.nw_rent) }}</div>
-              <div class="helper">Home value ${{ "{:,.0f}".format(breakeven_row.home_value) }} | Mortgage balance ${{ "{:,.0f}".format(breakeven_row.mortgage_balance) }}</div>
+              {% set sell_costs = breakeven_row.home_value * result.assumptions.sell_cost_pct %}
+              {% set equity = (breakeven_row.home_value - sell_costs - breakeven_row.mortgage_balance) %}
+              <div class="helper">
+                Home value ${{ "{:,.0f}".format(breakeven_row.home_value) }}
+                | Selling costs ${{ "{:,.0f}".format(sell_costs) }}
+                | Mortgage balance ${{ "{:,.0f}".format(breakeven_row.mortgage_balance) }}
+                | Net equity ${{ "{:,.0f}".format((equity if equity > 0 else 0.0)) }}
+              </div>
             </div>
           {% endif %}
         </div>
